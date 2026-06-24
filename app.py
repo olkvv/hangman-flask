@@ -1,11 +1,13 @@
 import os
 import random
 import time
+from pathlib import Path
 
 from flask import Flask, redirect, render_template, request, session, url_for
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "tajny_klucz_do_gry")
+BASE_DIR = Path(__file__).resolve().parent
 
 POZIOMY = {
     "latwy": {"nazwa": "Łatwy", "proby": 8},
@@ -59,7 +61,8 @@ POLSKI_ALFABET = [
 
 
 def wczytaj_slowa(nazwa_pliku):
-    with open(nazwa_pliku, "r", encoding="utf-8") as plik:
+    sciezka = BASE_DIR / nazwa_pliku
+    with open(sciezka, "r", encoding="utf-8") as plik:
         return [slowo.strip().lower() for slowo in plik if slowo.strip()]
 
 
