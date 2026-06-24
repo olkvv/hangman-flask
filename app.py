@@ -6,7 +6,7 @@ from pathlib import Path
 from flask import Flask, redirect, render_template, request, session, url_for
 
 app = Flask(__name__)
-app.secret_key = os.environ.get("SECRET_KEY", "tajny_klucz_do_gry")
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY") or "tajny_klucz_do_gry"
 BASE_DIR = Path(__file__).resolve().parent
 
 POZIOMY = {
