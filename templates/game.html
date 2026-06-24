@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gra - Wisielec</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="shell game-shell">
+        <nav class="topbar" aria-label="Nawigacja">
+            <a class="ghost-link" href="{{ url_for('home') }}">Menu</a>
+            <span>Wisielec</span>
+        </nav>
+
+        <section class="game-layout">
+            <div class="board">
+                <div class="status-row">
+                    <span>{{ poziom }}</span>
+                    <span>{{ kategoria }}</span>
+                    <span>{{ proby }}/{{ maks_proby }} prób</span>
+                </div>
+
+                <div class="gallows" aria-label="Rysunek wisielca">
+                    <svg viewBox="0 0 260 260" role="img">
+                        <line class="wood" x1="45" y1="230" x2="215" y2="230"/>
+                        <line class="wood" x1="75" y1="230" x2="75" y2="35"/>
+                        <line class="wood" x1="73" y1="35" x2="178" y2="35"/>
+                        <line class="wood" x1="176" y1="35" x2="176" y2="65"/>
+                        {% if etap_wisielca >= 1 %}
+                            <circle class="person" cx="176" cy="86" r="21"/>
+                        {% endif %}
+                        {% if etap_wisielca >= 2 %}
+                            <line class="person" x1="176" y1="108" x2="176" y2="166"/>
+                        {% endif %}
+                        {% if etap_wisielca >= 3 %}
+                            <line class="person" x1="176" y1="126" x2="141" y2="148"/>
+                        {% endif %}
+                        {% if etap_wisielca >= 4 %}
+                            <line class="person" x1="176" y1="126" x2="211" y2="148"/>
+                        {% endif %}
+                        {% if etap_wisielca >= 5 %}
+                            <line class="person" x1="176" y1="166" x2="148" y2="205"/>
+                        {% endif %}
+                        {% if etap_wisielca >= 6 %}
+                            <line class="person" x1="176" y1="166" x2="204" y2="205"/>
+                        {% endif %}
+                    </svg>
+                </div>
+
+                <div class="word" aria-label="Ukryte haslo">
+                    {% for znak in haslo %}
+                        <span class="{% if znak == ' ' %}space{% elif znak != '_' %}revealed{% endif %}">{{ znak }}</span>
+                    {% endfor %}
+                </div>
+
+                {% if komunikat %}
+                    <p class="message {% if koniec_gry and wygrana %}success{% elif koniec_gry %}danger{% endif %}">
+                        {{ komunikat }}
+                    </p>
+                {% endif %}
+            </div>
+
+            <aside class="side-panel">
+                <div class="meter">
+                    <div>
+                        <span class="label">Pozostałe próby</span>
+                        <strong>{{ proby }}</strong>
+                    </div>
+                    <progress value="{{ proby }}" max="{{ maks_proby }}"></progress>
+                </div>
+
+                {% if czas_gry is not none %}
+                    <div class="result-box">
+                        <span class="label">Czas gry</span>
+                        <strong>{{ czas_gry }} s</strong>
+                    </div>
+                {% endif %}
+
+                <div>
+                    <span class="label">Wpisane litery</span>
+                    <div class="used-letters">
+                        {% if wpisane_litery %}
+                            {% for litera in wpisane_litery %}
+                                <span>{{ litera }}</span>
+                            {% endfor %}
+                        {% else %}
+                            <em>Brak</em>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if not koniec_gry %}
+                    <form class="guess-form" method="POST" action="{{ url_for('guess') }}">
+                        <label for="litera">Wpisz literę</label>
+                        <div class="guess-row">
+                            <input id="litera" type="text" name="litera" maxlength="1" autocomplete="off" autofocus required>
+                            <button class="primary-button" type="submit">Sprawdź</button>
+                        </div>
+                    </form>
+
+                    <form class="keyboard" method="POST" action="{{ url_for('guess') }}" aria-label="Klawiatura">
+                        {% for litera in alfabet %}
+                            <button
+                                type="submit"
+                                name="litera"
+                                value="{{ litera }}"
+                                {% if litera in wpisane_litery %}disabled{% endif %}
+                            >
+                                {{ litera }}
+                            </button>
+                        {% endfor %}
+                    </form>
+
+                    <form method="POST" action="{{ url_for('hint') }}">
+                        <button class="secondary-button" type="submit">Podpowiedź (-1 próba)</button>
+                    </form>
+                {% else %}
+                    <div class="end-actions">
+                        <form method="POST" action="{{ url_for('restart') }}">
+                            <button class="primary-button" type="submit">Zagraj ponownie</button>
+                        </form>
+                        <a class="secondary-link" href="{{ url_for('home') }}">Powrót do menu</a>
+                    </div>
+                {% endif %}
+            </aside>
+        </section>
+    </main>
+</body>
+</html>

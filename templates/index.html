@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wisielec</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="shell start-shell">
+        <section class="start-panel">
+            <div class="intro">
+                <span class="eyebrow">Gra przeglądarkowa</span>
+                <h1>Wisielec</h1>
+                <p>Wybierz tryb, odkrywaj litery i uratuj hasło, zanim skończą się próby.</p>
+
+                <div class="mini-scene" aria-hidden="true">
+                    <div class="scene-post"></div>
+                    <div class="scene-rope"></div>
+                    <div class="scene-word">
+                        <span>W</span><span>I</span><span>S</span><span>I</span><span>E</span><span>L</span><span>E</span><span>C</span>
+                    </div>
+                </div>
+            </div>
+
+            <form class="setup" method="POST" action="{{ url_for('start') }}">
+                <div class="field-group">
+                    <label for="poziom">Tryb gry</label>
+                    <select id="poziom" name="poziom">
+                        {% for id, poziom in poziomy.items() %}
+                            <option value="{{ id }}">{{ poziom.nazwa }} - {{ poziom.proby }} prób</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field-group" id="category-field">
+                    <label for="kategoria">Kategoria</label>
+                    <select id="kategoria" name="kategoria">
+                        {% for id, kategoria in kategorie.items() %}
+                            <option value="{{ id }}">{{ kategoria.nazwa }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <button class="info-button" id="category-info-button" type="button">
+                    Opisy kategorii
+                </button>
+
+                <button class="primary-button" type="submit">Rozpocznij grę</button>
+            </form>
+        </section>
+    </main>
+
+    <div class="modal" id="category-modal" aria-hidden="true">
+        <div class="modal-backdrop" data-close-modal></div>
+        <section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <div class="modal-heading">
+                <h2 id="modal-title">Kategorie</h2>
+                <button class="close-button" type="button" aria-label="Zamknij" data-close-modal>×</button>
+            </div>
+
+            <div class="category-preview">
+                {% for kategoria in kategorie.values() %}
+                    <article>
+                        <strong>{{ kategoria.nazwa }}</strong>
+                        <span>{{ kategoria.opis }}</span>
+                    </article>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const modeSelect = document.querySelector("#poziom");
+        const categoryField = document.querySelector("#category-field");
+        const categorySelect = document.querySelector("#kategoria");
+        const categoryInfoButton = document.querySelector("#category-info-button");
+        const categoryModal = document.querySelector("#category-modal");
+        const closeModalButtons = document.querySelectorAll("[data-close-modal]");
+
+        function updateCategoryVisibility() {
+            const proverbMode = modeSelect.value === "przyslowia";
+            categoryField.hidden = proverbMode;
+            categorySelect.disabled = proverbMode;
+            categoryInfoButton.hidden = proverbMode;
+            if (proverbMode) {
+                closeCategoryModal();
+            }
+        }
+
+        function openCategoryModal() {
+            categoryModal.classList.add("is-open");
+            categoryModal.setAttribute("aria-hidden", "false");
+        }
+
+        function closeCategoryModal() {
+            categoryModal.classList.remove("is-open");
+            categoryModal.setAttribute("aria-hidden", "true");
+        }
+
+        modeSelect.addEventListener("change", updateCategoryVisibility);
+        categoryInfoButton.addEventListener("click", openCategoryModal);
+        closeModalButtons.forEach((button) => {
+            button.addEventListener("click", closeCategoryModal);
+        });
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                closeCategoryModal();
+            }
+        });
+        updateCategoryVisibility();
+    </script>
+</body>
+</html>
