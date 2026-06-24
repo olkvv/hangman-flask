@@ -30,3 +30,4 @@ Aplikacja uruchomi się pod adresem `http://127.0.0.1:5000`.
    - start command: `gunicorn app:app`
 4. Dodaj zmienną środowiskową `SECRET_KEY` z własną losową wartością.
 # hangman-flask
+# hangman-flask
